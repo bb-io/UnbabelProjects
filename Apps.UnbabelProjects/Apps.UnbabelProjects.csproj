@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Product>App</Product>
-        <Description>Description</Description>
+        <Product>Unbabel Projects</Product>
+        <Description>LangOps platform</Description>
         <Version>1.0.0</Version>
-        <AssemblyName>Apps.App</AssemblyName>
+        <AssemblyName>Apps.UnbabelProjects</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Actions\" />
+      <Folder Include="Models\Request\" />
     </ItemGroup>
 
 </Project>

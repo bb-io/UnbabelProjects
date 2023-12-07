@@ -1,12 +1,12 @@
 ﻿using Blackbird.Applications.Sdk.Common;
 
-namespace Apps.App;
+namespace Apps.UnbabelProjects;
 
-public class Application : IApplication
+public class UnbabelProjectsApplication : IApplication
 {
     public string Name
     {
-        get => "App";
+        get => "Unbabel Projects";
         set { }
     }
 
