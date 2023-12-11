@@ -1,4 +1,5 @@
 using Apps.UnbabelProjects.Constants;
+using Apps.UnbabelProjects.Extensions;
 using Apps.UnbabelProjects.Invocables;
 using Apps.UnbabelProjects.Models.Entities;
 using Apps.UnbabelProjects.Models.Request.File;
@@ -8,7 +9,6 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
-using Blackbird.Applications.Sdk.Utils.Utilities;
 using RestSharp;
 
 namespace Apps.UnbabelProjects.Actions;
@@ -32,16 +32,20 @@ public class FileActions : UnbabelProjectsInvocable
     [Action("Upload file", Description = "Upload a new file to the project")]
     public async Task<FileEntity> UploadFile(
         [ActionParameter] ProjectRequest project,
-        [ActionParameter] UploadFileRequest input)
+        [ActionParameter] UploadFileInput input,
+        [ActionParameter] FileContentRequest file)
     {
         var request = new RestRequest($"/projects/v0/customers/{CustomerId}/projects/{project.ProjectId}/files",
                 Method.Post)
-            .WithJsonBody(input, JsonConfig.Settings);
+            .WithJsonBody(new UploadFileRequest(input), JsonConfig.Settings);
         var response = await Client.ExecuteWithErrorHandling<UploadFileResponse>(request, Creds);
 
-        var uploadRequest = new RestRequest(response.UploadUrl, Method.Post)
-            .AddFile("file", "my text file"u8.ToArray(), "myfile1.txt");
+        var uploadRequest = new RestRequest(response.UploadUrl, Method.Put)
+            .AddFile("file", file.File.Bytes, file.FileName ?? file.File.Name);
         var uploadResponse = await new RestClient().ExecuteAsync(uploadRequest);
+
+        if (!uploadResponse.IsSuccessStatusCode)
+            throw new(uploadResponse.Content);
 
         return response;
     }
@@ -54,10 +58,17 @@ public class FileActions : UnbabelProjectsInvocable
         if (file.DownloadUrl is null)
             throw new("File does not have content yet");
 
-        var fileContent = await FileDownloader.DownloadFileBytes(file.DownloadUrl);
-        fileContent.Name = file.Name;
+        var downloadResponse = await DownloadFileContent(file.DownloadUrl);
 
-        return new(fileContent);
+        var contentTypeHeader =
+            downloadResponse.ContentHeaders!.First(x => x.Name == "Content-Type").Value!.ToString()!;
+        var fileContent = await downloadResponse.RawBytes!.ReadFromMultipartFormData(contentTypeHeader);
+
+        return new(new(fileContent)
+        {
+            Name = file.Name,
+            ContentType = MimeTypes.GetMimeType(file.Name)
+        });
     }
 
     [Action("Get file", Description = "Get details of a specific file")]
@@ -76,5 +87,15 @@ public class FileActions : UnbabelProjectsInvocable
         var request = new RestRequest(endpoint, Method.Delete);
 
         return Client.ExecuteWithErrorHandling(request, Creds);
+    }
+
+    private async Task<RestResponse> DownloadFileContent(string fileDownloadUrl)
+    {
+        var response = await new RestClient().ExecuteAsync(new(fileDownloadUrl));
+
+        if (!response.IsSuccessStatusCode)
+            throw new($"Failed to download file from {fileDownloadUrl}; Response: {response.Content}");
+
+        return response;
     }
 }
