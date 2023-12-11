@@ -41,7 +41,7 @@ public class UnbabelProjectsClient : BlackBirdRestClient
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
-        if (response.Content is null)
+        if (string.IsNullOrWhiteSpace(response.Content))
             return new("Something went wrong");
         
         var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(response.Content, JsonSettings)!;
