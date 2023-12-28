@@ -8,7 +8,9 @@ using Apps.UnbabelProjects.Models.Response.File;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 
 namespace Apps.UnbabelProjects.Actions;
@@ -16,8 +18,10 @@ namespace Apps.UnbabelProjects.Actions;
 [ActionList]
 public class FileActions : UnbabelProjectsInvocable
 {
-    public FileActions(InvocationContext invocationContext) : base(invocationContext)
+    private readonly IFileManagementClient _fileManagementClient;
+    public FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : base(invocationContext)
     {
+        _fileManagementClient = fileManagementClient;
     }
 
     [Action("List files", Description = "List all project files")]
@@ -40,8 +44,9 @@ public class FileActions : UnbabelProjectsInvocable
             .WithJsonBody(new UploadFileRequest(input), JsonConfig.Settings);
         var response = await Client.ExecuteWithErrorHandling<UploadFileResponse>(request, Creds);
 
+        var fileBytes = _fileManagementClient.DownloadAsync(file.File).Result.GetByteData().Result;
         var uploadRequest = new RestRequest(response.UploadUrl, Method.Put)
-            .AddFile("file", file.File.Bytes, file.FileName ?? file.File.Name);
+            .AddFile("file", fileBytes, file.FileName ?? file.File.Name);
         var uploadResponse = await new RestClient().ExecuteAsync(uploadRequest);
 
         if (!uploadResponse.IsSuccessStatusCode)
@@ -64,11 +69,10 @@ public class FileActions : UnbabelProjectsInvocable
             downloadResponse.ContentHeaders!.First(x => x.Name == "Content-Type").Value!.ToString()!;
         var fileContent = await downloadResponse.RawBytes!.ReadFromMultipartFormData(contentTypeHeader);
 
-        return new(new(fileContent)
-        {
-            Name = file.Name,
-            ContentType = MimeTypes.GetMimeType(file.Name)
-        });
+        using var stream = new MemoryStream(fileContent);
+        var fileResult = await _fileManagementClient.UploadAsync(stream, MimeTypes.GetMimeType(file.Name), file.Name);
+
+        return new(fileResult);
     }
 
     [Action("Get file", Description = "Get details of a specific file")]
