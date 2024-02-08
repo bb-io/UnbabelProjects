@@ -8,10 +8,10 @@ public class UploadFileRequest
     
     public string Extension { get; set; }
     
-    public UploadFileRequest(UploadFileInput input)
+    public UploadFileRequest(UploadFileInput input, FileContentRequest file)
     {
-        Name = input.Name;
+        Name = file.FileName ?? file.File.Name;
         Description = input.Description;
-        Extension = Path.GetExtension(input.Name).Replace(".", string.Empty);
+        Extension = Path.GetExtension(file.FileName ?? file.File.Name).Replace(".", string.Empty);
     }
 }
