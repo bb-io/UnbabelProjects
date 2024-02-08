@@ -41,7 +41,7 @@ public class FileActions : UnbabelProjectsInvocable
     {
         var request = new RestRequest($"/projects/v0/customers/{CustomerId}/projects/{project.ProjectId}/files",
                 Method.Post)
-            .WithJsonBody(new UploadFileRequest(input), JsonConfig.Settings);
+            .WithJsonBody(new UploadFileRequest(input, file), JsonConfig.Settings);
         var response = await Client.ExecuteWithErrorHandling<UploadFileResponse>(request, Creds);
 
         var fileBytes = _fileManagementClient.DownloadAsync(file.File).Result.GetByteData().Result;
