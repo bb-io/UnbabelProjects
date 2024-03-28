@@ -6,11 +6,11 @@ namespace Apps.UnbabelProjects.Models.Request.File;
 
 public class FileRequest
 {
-    [Display("Project")]
+    [Display("Project ID")]
     [DataSource(typeof(ProjectDataHandler))]
     public string ProjectId { get; set; }
     
-    [Display("File")]
+    [Display("File ID")]
     [DataSource(typeof(FileDataHandler))]
     public string FileId { get; set; }
 }
