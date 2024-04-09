@@ -63,6 +63,7 @@ public class UnbabelProjectsClient : BlackBirdRestClient
     {
         string? nextToken = null;
 
+        request.Resource = request.Resource.SetQueryParameter("page_size", (limit ?? 50).ToString());
         var result = new List<T>();
         do
         {

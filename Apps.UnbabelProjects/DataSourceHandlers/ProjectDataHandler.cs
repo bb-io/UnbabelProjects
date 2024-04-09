@@ -26,6 +26,6 @@ public class ProjectDataHandler : UnbabelProjectsInvocable, IAsyncDataSourceHand
                 Name = context.SearchString
             }, JsonSerializer.Create(JsonConfig.Settings)), 50);
 
-        return items.ToDictionary(x => x.Id, x => x.Name);
+        return items.DistinctBy(x => x.Id).ToDictionary(x => x.Id, x => x.Name);
     }
 }
