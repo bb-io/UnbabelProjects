@@ -24,7 +24,7 @@ public class ProjectDataHandler : UnbabelProjectsInvocable, IAsyncDataSourceHand
             JObject.FromObject(new SearchProjectsRequest()
             {
                 Name = context.SearchString
-            }, JsonSerializer.Create(JsonConfig.Settings)));
+            }, JsonSerializer.Create(JsonConfig.Settings)), 50);
 
         return items.ToDictionary(x => x.Id, x => x.Name);
     }

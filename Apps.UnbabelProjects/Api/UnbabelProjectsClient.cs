@@ -59,7 +59,7 @@ public class UnbabelProjectsClient : BlackBirdRestClient
     }
 
     public async Task<List<T>> Paginate<T>(RestRequest request, AuthenticationCredentialsProvider[] creds,
-        JObject payload)
+        JObject payload, int? limit = default)
     {
         string? nextToken = null;
 
@@ -73,6 +73,10 @@ public class UnbabelProjectsClient : BlackBirdRestClient
 
             nextToken = response.NextPageToken;
             result.AddRange(response.Results);
+
+            if (limit != default && result.Count >= limit)
+                return result;
+            
         } while (!string.IsNullOrWhiteSpace(nextToken));
 
         return result;
