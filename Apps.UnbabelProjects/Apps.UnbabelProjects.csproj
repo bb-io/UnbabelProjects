@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>Unbabel Projects</Product>
         <Description>LangOps platform</Description>
-        <Version>1.0.5</Version>
+        <Version>1.0.7</Version>
         <AssemblyName>Apps.UnbabelProjects</AssemblyName>
     </PropertyGroup>
 
