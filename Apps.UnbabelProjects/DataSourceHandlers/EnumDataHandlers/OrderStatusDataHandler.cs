@@ -1,10 +1,10 @@
-using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.UnbabelProjects.DataSourceHandlers.EnumDataHandlers;
 
-public class OrderStatusDataHandler : EnumDataHandler
+public class OrderStatusDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    public Dictionary<string, string> GetData() => new()
     {
         { "created", "Created" },
         { "services_pre_pipeline", "Services pre pipeline" },

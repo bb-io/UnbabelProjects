@@ -1,10 +1,10 @@
-using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.UnbabelProjects.DataSourceHandlers.EnumDataHandlers;
 
-public class ProjectStatusDataHandler : EnumDataHandler
+public class ProjectStatusDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    public Dictionary<string, string> GetData() => new()
     {
         { "created", "Created" },
         { "submitted", "Submitted" },

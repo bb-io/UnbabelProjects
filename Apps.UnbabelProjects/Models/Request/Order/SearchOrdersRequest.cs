@@ -1,6 +1,7 @@
 using Apps.UnbabelProjects.DataSourceHandlers;
 using Apps.UnbabelProjects.DataSourceHandlers.EnumDataHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.UnbabelProjects.Models.Request.Order;
@@ -15,6 +16,6 @@ public class SearchOrdersRequest
     
     public IEnumerable<string>? Extension { get; set; }
     
-    [DataSource(typeof(OrderStatusDataHandler))]
+    [StaticDataSource(typeof(OrderStatusDataHandler))]
     public IEnumerable<string>? Status { get; set; }
 }
